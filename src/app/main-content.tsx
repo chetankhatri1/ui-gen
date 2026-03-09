@@ -14,6 +14,7 @@ import { CodeEditor } from "@/components/editor/CodeEditor";
 import { PreviewFrame } from "@/components/preview/PreviewFrame";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HeaderActions } from "@/components/HeaderActions";
+import { cn } from "@/lib/utils";
 
 interface MainContentProps {
   user?: {
@@ -74,13 +75,15 @@ export function MainContent({ user, project }: MainContentProps) {
                   <HeaderActions user={user} projectId={project?.id} />
                 </div>
 
-                {/* Content Area */}
-                <div className="flex-1 overflow-hidden bg-neutral-50">
-                  {activeView === "preview" ? (
-                    <div className="h-full bg-white">
-                      <PreviewFrame />
-                    </div>
-                  ) : (
+                {/* Content Area - both views stay mounted to avoid reload/reinitialization on tab switch */}
+                <div className="flex-1 overflow-hidden bg-neutral-50 relative">
+                  {/* Preview */}
+                  <div className={cn("absolute inset-0 bg-white", activeView !== "preview" && "invisible pointer-events-none")}>
+                    <PreviewFrame />
+                  </div>
+
+                  {/* Code Editor */}
+                  <div className={cn("absolute inset-0", activeView !== "code" && "invisible pointer-events-none")}>
                     <ResizablePanelGroup
                       direction="horizontal"
                       className="h-full"
@@ -105,7 +108,7 @@ export function MainContent({ user, project }: MainContentProps) {
                         </div>
                       </ResizablePanel>
                     </ResizablePanelGroup>
-                  )}
+                  </div>
                 </div>
               </div>
             </ResizablePanel>
